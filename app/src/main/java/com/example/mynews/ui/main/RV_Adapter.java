@@ -17,17 +17,19 @@ import com.example.mynews.ui.webview.WebViewActivity;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class RV_Adapter extends RecyclerView.Adapter<RV_view_holder> implements OnItemClickListener{
-    private ArrayList<Article> list;
+    private List<Article> list;
     private Context context;
     public RV_Adapter() {
 
     }
 
-    public void updateNews(ArrayList<Article> list){
+    public void updateNews(List<Article> list){
         this.list = list;
+        notifyDataSetChanged();
 
     }
     @NonNull

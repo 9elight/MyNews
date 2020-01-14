@@ -1,13 +1,10 @@
 package com.example.mynews.ui.main;
 
-import android.util.Log;
-import android.widget.Toast;
-
 import com.example.mynews.data.RetrofitBuilder;
 import com.example.mynews.data.entity.Article;
-import com.example.mynews.data.entity.Articles;
+import com.example.mynews.data.entity.Example;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -24,17 +21,37 @@ public class MainPresenter implements MainContract.Presenter {
 
     @Override
     public void getNews() {
-        RetrofitBuilder.getNewsService().getNews2("ru",API_KEY)
-                .enqueue(new Callback<Articles>() {
+
+        RetrofitBuilder.getNewsService().getNews("ru",API_KEY)
+                .enqueue(new Callback<Example>() {
                     @Override
-                    public void onResponse(Call<Articles> call, Response<Articles> response) {
-                        ArrayList<Article> newsList = response.body().getList();
+                    public void onResponse(Call<Example> call, Response<Example> response) {
+                        List<Article> newsList = response.body().getArticles();
+                        if (newsList.size() < 1) {
+                            mView.rv_builder(newsList);
+                        }else {
+
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<Example> call, Throwable t) {
+                        mView.toast(t.getLocalizedMessage());
+                    }
+                });
+    }
+
+    @Override
+    public void getNewsQword(String qWord) {
+        RetrofitBuilder.getNewsService().getNewsQword(qWord,"ru",API_KEY)
+                .enqueue(new Callback<Example>() {
+                    @Override
+                    public void onResponse(Call<Example> call, Response<Example> response) {
+                        List<Article> newsList = response.body().getArticles();
                         mView.rv_builder(newsList);
-                        
                     }
 
                     @Override
-                    public void onFailure(Call<Articles> call, Throwable t) {
+                    public void onFailure(Call<Example> call, Throwable t) {
                         mView.toast(t.getLocalizedMessage());
                     }
                 });

@@ -1,6 +1,8 @@
 package com.example.mynews.ui.main;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -8,6 +10,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -17,19 +22,18 @@ import com.example.mynews.R;
 import com.example.mynews.data.entity.Article;
 
 
-import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
 public class MainActivity extends AppCompatActivity implements MainContract.View {
-    @BindView(R.id.toolbar)
-    Toolbar toolbar;
 
     private RecyclerView recyclerView;
     private ProgressBar progressBar;
     private MainContract.Presenter mPresenter;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,12 +51,10 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     private void initViews(){
         recyclerView = findViewById(R.id.recycler_view);
         progressBar = findViewById(R.id.progress_bar);
+        toolbar = findViewById(R.id.toolbar);
 
     }
-
-
-
-    public void rv_builder(ArrayList<Article> list) {
+    public void rv_builder(List<Article> list) {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this
                 , RecyclerView.VERTICAL, false);
         recyclerView.setLayoutManager(layoutManager);
@@ -70,9 +72,43 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         context.startActivity(new Intent(context, MainActivity.class));
     }
     @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.popular:
+                mPresenter.getNews();
+        }
+        return true;
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         mPresenter.unbind();
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater =getMenuInflater();
+        inflater.inflate(R.menu.menu_main,menu);
+        MenuItem menuItem = menu.findItem(R.id.action_search);
+        androidx.appcompat.widget.SearchView searchView = (androidx.appcompat.widget.SearchView) menuItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mPresenter.getNewsQword(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+
+
+        return true;
+    }
+
+
 
 }
